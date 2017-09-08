@@ -1,8 +1,12 @@
 package com.mendokuse.afternoonteaorder;
 
+
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -11,25 +15,54 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class StoreActivity extends AppCompatActivity {
-
+    private FragmentManager mainViewManager;
+    private FragmentTransaction mainViewTransaction;
+    private Fragment nowFragment;
+    private StoreListFragment storeListFragment;
+    private MenuFragment menuFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store);
+        //Fragment初始化
+        mainViewManager = getSupportFragmentManager();
+        mainViewTransaction = mainViewManager.beginTransaction();
+        storeListFragment = new StoreListFragment();
+        mainViewTransaction.add(R.id.content_view, storeListFragment).commit();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Log.d("test","githubtest");
-        //test
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
+        });*/
     }
-
+    public void tabeItemOnclick(View view){
+        Fragment changeFragment = new Fragment();
+        //storeListFragment.isAdded()
+        switch (view.getId()) {
+            case R.id.tabItem_storelist:
+                changeFragment = storeListFragment;
+                break;
+            case R.id.tabItem_menu:
+                changeFragment = menuFragment;
+                break;
+        }
+        if( nowFragment != changeFragment){
+            if (!changeFragment.isAdded()) {
+                mainViewTransaction.hide(nowFragment)
+                        .add(R.id.content_view, changeFragment).commit();
+            } else {
+                mainViewTransaction.hide(nowFragment)
+                        .show(changeFragment).commit();
+            }
+            nowFragment = changeFragment;
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
